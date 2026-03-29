@@ -12,7 +12,7 @@
 # ------------------------------------------------------------------------------
 
 # If we have tput, let's set colors
-if [[ ! -z $(which tput 2> /dev/null) ]]; then
+if command -v tput >/dev/null 2>&1; then
   reset=$(tput sgr0)
   bold=$(tput bold)
   red=$(tput setaf 1)
@@ -39,6 +39,10 @@ USER_DEST_SETUP="${ZDOTDIR:-$HOME}/.zfunctions/$PROMPT_SETUP"
 
 GLOBAL_DEST_ASYNC="/usr/local/share/zsh/site-functions/$PROMPT_ASYNC"
 USER_DEST_ASYNC="${ZDOTDIR:-$HOME}/.zfunctions/$PROMPT_ASYNC"
+
+TYPEWRITTEN_BLOCK_START="# >>> typewritten prompt >>>"
+TYPEWRITTEN_BLOCK_END="# <<< typewritten prompt <<<"
+TYPEWRITTEN_FPATH_LINE="fpath=(\$fpath \"${ZDOTDIR:-$HOME}/.zfunctions\")"
 
 # ------------------------------------------------------------------------------
 # HELPERS
@@ -82,12 +86,15 @@ rmln() {
 remove_zshrc_content() {
   info "Removing typewritten from \"${ZDOTDIR:-$HOME}/.zshrc\""
   # Remove enabling statements from .zshrc
-  # and remove typewritten configuration
-  sed '/^# Set typewritten ZSH as a prompt$/d' "$ZSHRC" | \
-  sed '/^autoload -U promptinit; promptinit$/d' | \
-  sed '/^prompt typewritten$/d' | \
-  sed '/.*TYPEWRITTEN_.*=.*$/d' > "$ZSHRC.bak" && \
-  mv -- "$ZSHRC.bak" "$ZSHRC"
+  awk -v start="$TYPEWRITTEN_BLOCK_START" -v end="$TYPEWRITTEN_BLOCK_END" '
+    $0 == start { in_block = 1; next }
+    $0 == end { in_block = 0; next }
+    !in_block { print }
+  ' "$ZSHRC" > "$ZSHRC.bak"
+
+  grep -Fvx "$TYPEWRITTEN_FPATH_LINE" "$ZSHRC.bak" > "$ZSHRC.tmp" || true
+  mv "$ZSHRC.tmp" "$ZSHRC"
+  rm -f "$ZSHRC.bak"
 }
 
 main() {
@@ -108,11 +115,11 @@ main() {
   fi
 
   # Remove typewritten from .zshrc
-  if grep -q "typewritten" "$ZSHRC"; then
+  if [[ -f "$ZSHRC" ]] && grep -q "typewritten" "$ZSHRC"; then
     if [[ '-y' == $1 ]]; then
       remove_zshrc_content
     else
-      read "answer?Would you like to remove you typewritten ZSH configuration from .zshrc? (y/N)"
+      read "answer?Would you like to remove your typewritten ZSH configuration from .zshrc? (y/N)"
       if [[ 'y' == ${answer:l} ]]; then
         read "answer?Are you sure? Any symlinks to your ZSH configuration file might be removed? (y/N)"
         if [[ 'y' == ${answer:l} ]]; then

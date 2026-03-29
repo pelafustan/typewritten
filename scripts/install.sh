@@ -12,7 +12,7 @@
 # ------------------------------------------------------------------------------
 
 # If we have tput, let's set colors
-if [[ ! -z $(which tput 2> /dev/null) ]]; then
+if command -v tput >/dev/null 2>&1; then
   reset=$(tput sgr0)
   bold=$(tput bold)
   red=$(tput setaf 1)
@@ -37,6 +37,10 @@ USER_SOURCE="${ZDOTDIR:-$HOME}/.typewritten-prompt"
 
 DEST='/usr/local/share/zsh/site-functions'
 USER_DEST="${ZDOTDIR:-$HOME}/.zfunctions"
+
+TYPEWRITTEN_BLOCK_START="# >>> typewritten prompt >>>"
+TYPEWRITTEN_BLOCK_END="# <<< typewritten prompt <<<"
+TYPEWRITTEN_FPATH_LINE="fpath=(\$fpath \"$USER_DEST\")"
 
 # ------------------------------------------------------------------------------
 # HELPERS
@@ -64,10 +68,21 @@ code()    { paint "$bold"   "typewritten: $@" ; }
 # Append text in .zshrc
 # USAGE:
 #   append_zshrc [text...]
-append_zshrc() {
+ensure_zshrc() {
+  mkdir -p "${ZSHRC:h}"
+  touch "$ZSHRC"
+}
+
+zshrc_contains() {
+  grep -Fqx "$1" "$ZSHRC"
+}
+
+append_zshrc_block() {
+  local block=$1
+
   info "These lines will be added to your \"${ZDOTDIR:-$HOME}/.zshrc\" file:"
-  code "$@"
-  echo "$@" >> "${ZDOTDIR:-$HOME}/.zshrc"
+  code "$block"
+  print -r -- "$block" >> "$ZSHRC"
 }
 
 # ------------------------------------------------------------------------------
@@ -76,6 +91,8 @@ append_zshrc() {
 # ------------------------------------------------------------------------------
 
 main() {
+  ensure_zshrc
+
   # How we install typewritten:
   #   1. Install via NPM
   #   2. Install via curl or wget
@@ -97,8 +114,10 @@ main() {
     # Use $USER_DEST instead
     DEST="$USER_DEST"
 
-    info "Adding $DEST to fpath..."
-    echo 'fpath=($fpath "'"$DEST"'")' >> "$ZSHRC"
+    if ! zshrc_contains "$TYPEWRITTEN_FPATH_LINE"; then
+      info "Adding $DEST to fpath..."
+      print -r -- "$TYPEWRITTEN_FPATH_LINE" >> "$ZSHRC"
+    fi
 
     info "Trying to symlink $SOURCE to $DEST"
     info "Trying to symlink $ASYNC_SOURCE to $DEST"
@@ -112,18 +131,19 @@ main() {
   ln -sf "$ASYNC_SOURCE" "$DEST/async"
 
   # If 'prompt typewritten' is already present in .zshrc, then skip
-  if sed 's/#.*//' "$ZSHRC" | grep -q "prompt typewritten"; then
+  if grep -Fq "$TYPEWRITTEN_BLOCK_START" "$ZSHRC" || grep -Eq '^[[:space:]]*prompt[[:space:]]+typewritten([[:space:]]|$)' "$ZSHRC"; then
     warn "typewritten is already present in .zshrc!"
     exit
   fi
 
   # Enabling statements for .zshrc
-  msg="\n# Set typewritten ZSH as a prompt"
+  msg="$TYPEWRITTEN_BLOCK_START"
   msg+="\nautoload -U promptinit; promptinit"
   msg+="\nprompt typewritten"
+  msg+="\n$TYPEWRITTEN_BLOCK_END"
 
   # Check if appending was successful and perform corresponding actions
-  if append_zshrc "$msg"; then
+  if append_zshrc_block "$msg"; then
     success "Done! Please, reload your terminal."
     echo
   else
