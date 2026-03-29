@@ -6,15 +6,15 @@ Click on an option's name to see more info.
 
 | Option                                                                                                                            | Description                                                                                    | Available options                                                         | Default value |
 | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------- |
-| [TYPEWRITTEN_PROMPT_LAYOUT](#typewritten_prompt_layout)                                                                           | Defines how the prompt is displayed.                                                           | `singleline`, `half_pure` , `pure`, `singleline_verbose`, and `multiline` | `singleline`  |
+| [TYPEWRITTEN_PROMPT_LAYOUT](#typewritten_prompt_layout)                                                                           | Defines how the prompt is displayed.                                                           | `singleline`, `half_pure`, `pure`, `pure_verbose`, `singleline_verbose`, and `multiline` | `singleline`  |
 | [TYPEWRITTEN_SYMBOL](#typewritten_symbol)                                                                                         | Defines the prompt symbol.                                                                     | Any string value                                                          | `❯`           |
 | [TYPEWRITTEN_ARROW_SYMBOL](#typewritten_arrow_symbol)                                                                             | Defines the arrow symbol.                                                                      | Any string value                                                          | `->`          |
-| [TYPEWRITTEN_RELATIVE_PATH](#typewritten_relative_path)                                                                           | Defines what the current directory display is relative to.                                     | `git`, `home`, `adaptive`, or `off`                                       | `git`         |
+| [TYPEWRITTEN_RELATIVE_PATH](#typewritten_relative_path)                                                                           | Defines what the current directory display is relative to.                                     | `git`, `home`, or `adaptive`                                              | `git`         |
 | [TYPEWRITTEN_CURSOR](#typewritten_cursor)                                                                                         | Defines the used cursor.                                                                       | `underscore`, `beam`, `block`, or `terminal`                              | `underscore`  |
 | [TYPEWRITTEN_LEFT_PROMPT_PREFIX](#typewritten_left_prompt_prefix-and-typewritten_right_prompt_prefix)                             | Defines what is displayed just before the prompt symbol on the left.                           | Any string                                                                |               |
 | [TYPEWRITTEN_LEFT_PROMPT_PREFIX_FUNCTION](#typewritten_left_prompt_prefix_function-and-typewritten_right_prompt_prefix_function)  | Defines what is displayed just before the prompt symbol on the left. Takes in a function name. | Any function name                                                         |               |
 | [TYPEWRITTEN_RIGHT_PROMPT_PREFIX](#typewritten_left_prompt_prefix-and-typewritten_right_prompt_prefix)                            | Defines what is displayed just before the right part of the prompt.                            | Any string                                                                |               |
-| [TYPEWRITTEN_RIGHT_PROMPT_PREFIX_FUNCTION](#typewritten_left_prompt_prefix_function-and-typewritten_right_prompt_prefix_function) | Defines what is displayed just before the prompt symbol on the left. Takes in a function name. | Any function name                                                         |               |
+| [TYPEWRITTEN_RIGHT_PROMPT_PREFIX_FUNCTION](#typewritten_left_prompt_prefix_function-and-typewritten_right_prompt_prefix_function) | Defines what is displayed just before the right prompt. Takes in a function name.              | Any function name                                                         |               |
 
 > All of these options are configurable through your `.zshrc` file like this:
 >
@@ -138,14 +138,6 @@ If you are outside of a git repository, the path will be displayed relative to `
   <img src="_media/adaptive_home_relative_path.png" alt="display path relative to home" />
 </p>
 
-**Off (`TYPEWRITTEN_RELATIVE_PATH="off"`)**
-
-This option being off means that at all times, the current directory display only shows the basename of the current directory.
-
-<p align="center">
-  <img src="_media/git_relative_path/git_no_relative_path.png" alt="hide git home directory" />
-</p>
-
 ## TYPEWRITTEN_CURSOR
 
 **Default underscore (`TYPEWRITTEN_CURSOR="underscore"`)**
@@ -172,7 +164,7 @@ By using this option, typewritten stops managing cursor preference. The cursor u
 
 ## TYPEWRITTEN_LEFT_PROMPT_PREFIX and TYPEWRITTEN_RIGHT_PROMPT_PREFIX
 
-This option is stricly used as a string value. To use functions, take a look at [TYPEWRITTEN_LEFT_PROMPT_PREFIX_FUNCTION](#typewritten_left_prompt_prefix_function-and-typewritten_right_prompt_prefix_function).
+This option is strictly used as a string value. To use functions, take a look at [TYPEWRITTEN_LEFT_PROMPT_PREFIX_FUNCTION](#typewritten_left_prompt_prefix_function-and-typewritten_right_prompt_prefix_function).
 
 **Display a string value**
 
@@ -205,7 +197,7 @@ export TYPEWRITTEN_LEFT_PROMPT_PREFIX_FUNCTION=date
 To customize what the timestamp will look like, you can use options:
 
 ```sh
-export TYPEWRITTEN_LEFT_PROMPT_PREFIX_FUNCTION=(date +%H:%M:%S)
+export TYPEWRITTEN_LEFT_PROMPT_PREFIX_FUNCTION="date +%H:%M:%S"
 ```
 
 <p align="center">

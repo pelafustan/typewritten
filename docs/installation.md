@@ -14,7 +14,7 @@ That's it. The script will make the necessary symlinks to `fpath` and set the pr
 brew install typewritten
 ```
 
-Then load typewritten in your `.zshrc` by using zsh prompinit:
+Then load typewritten in your `.zshrc` by using zsh `promptinit`:
 
 ```shell
 autoload -U promptinit; promptinit
@@ -30,7 +30,7 @@ mkdir -p "$HOME/.zsh"
 git clone https://github.com/reobin/typewritten.git "$HOME/.zsh/typewritten"
 ```
 
-Load typewritten in your `.zshrc` by using zsh prompinit:
+Load typewritten in your `.zshrc` by using zsh `promptinit`:
 
 ```shell
 fpath+=$HOME/.zsh/typewritten
