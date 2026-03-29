@@ -10,7 +10,7 @@ jobs:
     name: Validate release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check zsh sources
         run: zsh -n typewritten.zsh typewritten.plugin.zsh typewritten.zsh-theme prompt_typewritten_setup async async.zsh lib/colors.zsh lib/git.zsh scripts/install.sh scripts/uninstall.sh
@@ -24,7 +24,7 @@ jobs:
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
