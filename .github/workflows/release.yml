@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  validate:
+    name: Validate release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check zsh sources
+        run: zsh -n typewritten.zsh typewritten.plugin.zsh typewritten.zsh-theme prompt_typewritten_setup async async.zsh lib/colors.zsh lib/git.zsh scripts/install.sh scripts/uninstall.sh
+
+  publish:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs: validate
+    permissions:
+      contents: write
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Publish package to npm
+        if: env.NODE_AUTH_TOKEN != ''
+        run: npm publish
+
+      - name: Create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag
