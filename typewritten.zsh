@@ -171,6 +171,11 @@ tw_redraw() {
       RPROMPT="$tw_right_prompt_prefix$tw_displayed_wd$tw_git_arrow_info"
     fi;
 
+    if [ "$tw_layout" = "singleline_leftpath" ]; then
+        PROMPT="$tw_displayed_wd$tw_git_arrow_info $tw_full_prompt"
+        RPROMPT=""
+    fi;
+
     if [ "$tw_layout" = "multiline" ]; then
       PROMPT="$BREAK_LINE$tw_user_host$BREAK_LINE$tw_full_prompt"
       RPROMPT="$tw_right_prompt_prefix$tw_displayed_wd$tw_git_arrow_info"
